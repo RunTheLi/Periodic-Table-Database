@@ -25,6 +25,8 @@ CREATE TABLE types (
     type VARCHAR(30) NOT NULL
 );
 
+***  create a periodic_table folder in the project folder and turn it into a git repository with git init ***
+
 #Insert into 
 INSERT INTO types (type) VALUES ('nonmetal'), ('metal'), ('metalloid');
 
