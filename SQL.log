@@ -1,0 +1,58 @@
+ALTER TABLE properties RENAME COLUMN weight TO atomic_mass;
+ALTER TABLE properties RENAME COLUMN melting_point TO melting_point_celsius;
+ALTER TABLE properties RENAME COLUMN boiling_point TO boiling_point_celsius;
+
+
+ALTER TABLE properties ALTER COLUMN melting_point_celsius SET NOT NULL;
+ALTER TABLE properties ALTER COLUMN boiling_point_celsius SET NOT NULL;
+
+
+ALTER TABLE elements
+ALTER COLUMN symbol SET NOT NULL,
+ALTER COLUMN name SET NOT NULL,
+ADD CONSTRAINT unique_symbol UNIQUE(symbol),
+ADD CONSTRAINT unique_name UNIQUE(name);
+
+
+ALTER TABLE properties
+ADD CONSTRAINT fk_atomic_number FOREIGN KEY (atomic_number)
+REFERENCES elements (atomic_number);
+
+
+CREATE TABLE types (
+    type_id SERIAL PRIMARY KEY,
+    type VARCHAR(30) NOT NULL
+);
+
+
+INSERT INTO types (type) VALUES ('nonmetal'), ('metal'), ('metalloid');
+
+# Add type_id to properties table
+ALTER TABLE properties ADD COLUMN type_id INT REFERENCES types(type_id);
+
+# Update type_id in properties table
+UPDATE properties SET type_id=1 WHERE type='nonmetal';
+UPDATE properties SET type_id=2 WHERE type='metal';
+UPDATE properties SET type_id=3 WHERE type='metalloid';
+
+# Change type_id to null
+UPDATE types
+SET type_id = 3
+WHERE type = 'metalloid' AND type_id IS NULL;
+
+# Change type_id to not null
+ALTER TABLE properties ALTER COLUMN type_id SET NOT NULL;
+
+# Capitalize 
+UPDATE elements SET symbol='LI' WHERE symbol='li';
+UPDATE elements SET symbol='HE' WHERE symbol='he';
+UPDATE elements SET symbol='MT' WHERE symbol='mT';
+
+# Change to DECIMAL
+ALTER TABLE properties ALTER COLUMN atomic_mass SET DATA TYPE numeric(9,1);
+ALTER TABLE properties ALTER COLUMN atomic_mass SET DATA TYPE DECIMAL(9,0);
+ALTER TABLE properties ALTER COLUMN atomic_mass SET DATA TYPE DECIMAL;
+
+# Add elements
+INSERT INTO elements(atomic_number, symbol, name) VALUES(10, 'F', 'Fluorine');
+INSERT INTO elements(atomic_number, symbol, name) VALUES(10, 'Ne', 'Neon');
